@@ -1,11 +1,16 @@
+const MAX_PROMPT_LENGTH = 4000;
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { prompt } = req.body;
-  if (!prompt) {
+  const prompt = req.body?.prompt;
+  if (typeof prompt !== "string" || !prompt.trim()) {
     return res.status(400).json({ error: "prompt is required" });
+  }
+  if (prompt.length > MAX_PROMPT_LENGTH) {
+    return res.status(413).json({ error: "prompt is too long" });
   }
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
